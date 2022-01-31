@@ -64,10 +64,13 @@ module Tiler
     function warpTIF(tifName::String; sourceDirectory::String="./", tempDirectory::String="./", numThreads::Real=1)
         fullTif = sourceDirectory * "/" * tifName
         fullOutputTif = tempDirectory * "/" * "warped_" * tifName
-        if isfile(fullOutputTif) != true
-            aggr = `gdalwarp  -te_srs EPSG:4326 -te -180 -85.051129 180 85.051129 -t_srs EPSG:3857 -co NUM_THREADS=$numThreads -wo NUM_THREADS=$numThreads $fullTif $fullOutputTif`
-            run(aggr)
+        if isfile(fullOutputTif)
+            rm(fullOutputTif)
         end
+        #if isfile(fullOutputTif) != true
+        aggr = `gdalwarp  -te_srs EPSG:4326 -te -180 -85.051129 180 85.051129 -t_srs EPSG:3857 -co NUM_THREADS=$numThreads -wo NUM_THREADS=$numThreads $fullTif $fullOutputTif`
+        run(aggr)
+        #end
     end
 
     function formatTIF(tifName::String; sourceDirectory::String="./", tempDirectory::String="./", axis = nothing, transpose = false, numThreads = 1, removeTif = true)
@@ -162,7 +165,7 @@ module Tiler
         end
     end
 
-    function mapTile(tif::String; sourceDirectory::String="./", gpu::Bool=false, tile::Real=256, min::Real=0, max=8, filter=false, alpha = 1.0, kernel = Kernel.gaussian(3), outputDirectory=".", scale = false, scaleLevel = 0, formatted=false, numThreads::Real=1)
+    function mapTile(tif::String; sourceDirectory::String="./", gpu::Bool=false, tile::Real=256, min::Real=0, max=8, filter=false, alpha = 1.0, kernel = Kernel.gaussian(3), outputDirectory=".", scale = false, scaleLevel = 0, formatted=false, numThreads::Real=1, smoothing::String="linear", type=UInt8)
         mkpath(outputDirectory)
         if formatted == false
             img = formatTIF(tif; sourceDirectory=sourceDirectory, transpose=true, removeTif=false, numThreads = numThreads)
@@ -178,7 +181,7 @@ module Tiler
                 img = RGBA{N0f8}.(imfilter(img, kernel))
             end
             type = eltype(img)
-            imgTuple = reinterpret(NTuple{dims,UInt8}, img)
+            imgTuple = reinterpret(NTuple{dims, UInt8}, img)
         elseif scale == true # Grayscale & Adjust Vals
             imgScaled = img .* scaleLevel
             imgTuple = convert(typeof(img), imgScaled)
@@ -189,7 +192,7 @@ module Tiler
         end
         #for i in min:max
             #@info "Zoom level: $i"
-        @time resizeTile(imgTuple, min, max; axis=tile, saveType=type, gpu=gpu, outputDirectory=outputDirectory)
+        @time resizeTile(imgTuple, min, max; axis=tile, saveType=type, gpu=gpu, outputDirectory=outputDirectory, smoothing=smoothing)
         #end
         GC.gc()
         return 
