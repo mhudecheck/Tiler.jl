@@ -1,0 +1,12 @@
+name = "Tiler"
+uuid = "f6447c12-f9f1-4e41-b366-b5371c0f614f"
+authors = ["mhudecheck <mhudecheck@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+ArchGDAL = "c9ce4bd3-c3d5-55b8-8973-c0e20141b8c3"
+CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+ColorSchemes = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
+Images = "916415d5-f1e6-5110-898d-aaa5f9f070e0"
+Sentinel = "b367cf14-19c4-4862-849d-7c6f64208072"
+TiledIteration = "06e1c1a7-607b-532d-9fad-de7d9aa2abac"
