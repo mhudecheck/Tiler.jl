@@ -129,7 +129,7 @@ module Tiler
     end=#
 
     # Applies Color Scheme to GeoTIFF and Saves Result
-    function mapTIF(tif::String, outputName::String; outputDirectory::String=".", scheme::String="inferno", min::Float64=0, max::Float64=1, type=UInt8, scale::Real=1)
+    function mapTIF(tif::String, outputName::String; outputDirectory::String=".", scheme::String="inferno", min::Real=0, max::Real=1, type=UInt8, scale::Real=1)
         ArchGDAL.read(tif) do dataset
             # Read Information
             band = ArchGDAL.getband(dataset, 1)
@@ -198,7 +198,7 @@ module Tiler
         return 
     end
 
-    function resizeTile(raster::AbstractArray, zoomMin::Integer=0, zoomMax::Integer=8; gpu::Bool=true, axis::Integer=256, saveType=0, outputDirectory::String=".", interpolation::Bool=true, smoothing::String="linear")
+    function resizeTile(raster::AbstractArray, zoomMin::Integer=0, zoomMax::Integer=8; gpu::Bool=true, axis::Integer=256, saveType=0, outputDirectory::String=".", interpolation::Bool=true, smoothing::String="linear", device::Int=0)
         conv = 0
         if gpu == true & CUDA.functional() == true
             if isa(raster, CuArray) == false
@@ -209,7 +209,7 @@ module Tiler
         for i in zoomMin:zoomMax
             @info "Zoom level: $i"
             targetDim = axis * 2^i
-            @time outputRaster = resizeRaster(raster, targetDim, targetDim; gpu=gpu, interpolation=interpolation, smoothing=smoothing);
+            @time outputRaster = resizeRaster(raster, targetDim, targetDim; gpu=gpu, device=device, interpolation=interpolation, smoothing=smoothing);
             @time saveTiles(outputRaster, axis; zoom=i, type=saveType, outputDirectory=outputDirectory)
             outputRaster = nothing
         end
