@@ -165,7 +165,7 @@ module Tiler
         end
     end
 
-    function mapTile(tif::String; sourceDirectory::String="./", gpu::Bool=false, tile::Real=256, min::Real=0, device::Real=0, max=8, filter=false, alpha = 1.0, kernel = Kernel.gaussian(3), outputDirectory=".", scale = false, scaleLevel = 0, formatted=false, numThreads::Real=1, smoothing::String="linear", type=UInt8)
+    function mapTile(tif::String; sourceDirectory::String="./", gpu::Bool=false, tile::Real=256, min::Real=0, device=0, max=8, filter=false, alpha = 1.0, kernel = Kernel.gaussian(3), outputDirectory=".", scale = false, scaleLevel = 0, formatted=false, numThreads::Real=1, smoothing::String="linear", type=UInt8)
         mkpath(outputDirectory)
         if formatted == false
             img = formatTIF(tif; sourceDirectory=sourceDirectory, transpose=true, removeTif=false, numThreads = numThreads)
@@ -198,7 +198,7 @@ module Tiler
         return 
     end
 
-    function resizeTile(raster::AbstractArray, zoomMin::Integer=0, zoomMax::Integer=8; gpu::Bool=true, axis::Integer=256, saveType=0, outputDirectory::String=".", interpolation::Bool=true, smoothing::String="linear", device::Int=0)
+    function resizeTile(raster::AbstractArray, zoomMin::Integer=0, zoomMax::Integer=8; gpu::Bool=true, axis::Integer=256, saveType=0, outputDirectory::String=".", interpolation::Bool=true, smoothing::String="linear", device=0)
         conv = 0
         if gpu == true & CUDA.functional() == true
             if isa(raster, CuArray) == false
