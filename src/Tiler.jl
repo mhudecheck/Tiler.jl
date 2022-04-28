@@ -165,7 +165,7 @@ module Tiler
         end
     end
 
-    function mapTile(tif::String; sourceDirectory::String="./", gpu::Bool=false, tile::Real=256, min::Real=0, max=8, filter=false, alpha = 1.0, kernel = Kernel.gaussian(3), outputDirectory=".", scale = false, scaleLevel = 0, formatted=false, numThreads::Real=1, smoothing::String="linear", type=UInt8)
+    function mapTile(tif::String; sourceDirectory::String="./", gpu::Bool=false, tile::Real=256, min::Real=0, device::Real=0, max=8, filter=false, alpha = 1.0, kernel = Kernel.gaussian(3), outputDirectory=".", scale = false, scaleLevel = 0, formatted=false, numThreads::Real=1, smoothing::String="linear", type=UInt8)
         mkpath(outputDirectory)
         if formatted == false
             img = formatTIF(tif; sourceDirectory=sourceDirectory, transpose=true, removeTif=false, numThreads = numThreads)
@@ -192,7 +192,7 @@ module Tiler
         end
         #for i in min:max
             #@info "Zoom level: $i"
-        @time resizeTile(imgTuple, min, max; axis=tile, saveType=type, gpu=gpu, outputDirectory=outputDirectory, smoothing=smoothing)
+        @time resizeTile(imgTuple, min, max; axis=tile, device=device, saveType=type, gpu=gpu, outputDirectory=outputDirectory, smoothing=smoothing)
         #end
         GC.gc()
         return 
